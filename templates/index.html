@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+
+        <title>Flask CRUD</title>
+    </head>
+    <body>
+	    <div class="jumbotron p-3">
+	        <div class="well text-center">
+	            <h1>Python Flask CRUD Web Application</h1>
+	        </div>
+	    </div>
+
+	    <div class="container">
+	        <div class="row">
+	            <div class="col md-12">
+	                <div class="jumbotron p-3">
+	                    <h2>
+	                        Gerenciamento de <b>Funcionários</b>
+	                        <button  type="button"  class="btn btn-success float-right" data-toggle="modal" data-target="#modalAdd">
+	                            Cadastrar Funcionário
+	                        </button>
+	                    </h2>
+
+	                    {% with messages = get_flashed_messages() %}
+	                        {% if messages %}
+	                            {% for message in messages %}
+	                                <div class="alert alert-success alert-dismissable mt-4 text-center" role="alert">
+	                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+	                                        <span aria-hidden="true">x</span>
+	                                    </button>
+	                                    {{ message }}
+	                                </div>
+	                            {% endfor %}
+	                        {% endif %}
+	                    {% endwith %}
+
+	                    <table class="table table-hover table-dark mt-4">
+	                        <tr>
+	                            <th></th>
+	                            <th>Nome</th>
+	                            <th>Email</th>
+	                            <th>Celular</th>
+	                            <th>Ação</th>
+	                        </tr>
+	                        {% for funcionario in funcionarios %}
+	                        <tr>
+	                            <td>{{ funcionario.id }}</td>
+	                            <td>{{ funcionario.nome }}</td>
+	                            <td>{{ funcionario.email }}</td>
+	                            <td>{{ funcionario.celular }}</td>
+	                            <td>
+	                                <a 
+	                                	href="/editar/{{ funcionario.id }}" 
+	                                	class="btn btn-info btn-xs" 
+	                                	data-toggle="modal" 
+	                                	data-target="#modalEdit{{ funcionario.id }}">
+	                                	Editar
+	                                </a>
+	                                <a 
+	                                	href="{{ url_for('deletar', id=funcionario.id) }}" 
+	                                	class="btn btn-danger btn-xs" 
+	                                	onclick="return confirm('Tem certeza que deseja excluir o funcionário {{ funcionario.nome }}?')">
+	                                	Deletar
+	                                </a>
+	                            </td>
+	                        </tr>
+	                        {% endfor %}
+	                    </table>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+
+	    <!-- Modal cadastro de funcionário -->
+	    <div id="modalAdd" class="modal fade" role="dialog">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title">Cadastrar Funcionário</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <form action="{{ url_for('cadastrar_funcionario') }}" method="POST">
+	                        <div class="form-group">
+	                            <label>Nome</label>
+	                            <input type="text" class="form-control" name="nome" required="1">
+	                        </div>
+	                        <div class="form-group">
+	                            <label>Email</label>
+	                            <input type="email" class="form-control" name="email" required="1">
+	                        </div>
+	                        <div class="form-group">
+	                            <label>Celular</label>
+	                            <input type="text" class="form-control" name="celular" required="1">
+	                        </div>
+	                        <div class="form-group">
+	                            <button class="btn btn-primary" type="submit">Cadastrar</button>
+	                        </div>
+	                    </form>
+	                </div>
+
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <!-- End modal -->
+
+	    <!-- Modal edição de funcionário -->
+		{% for funcionario in funcionarios %}
+	    <div id="modalEdit{{ funcionario.id }}" class="modal fade" role="dialog">
+	        <div class="modal-dialog">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title">Editar Funcionário</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <form action="{{ url_for('editar') }}" method="POST">
+	                        <div class="form-group">
+	                            <label>Nome</label>
+	                            <input type="hidden" name="id" value="{{ funcionario.id }}">
+	                            <input type="text" class="form-control" name="nome" value="{{ funcionario.nome }}">
+	                        </div>
+	                        <div class="form-group">
+	                            <label>Email</label>
+	                            <input type="email" class="form-control" name="email" value="{{ funcionario.email }}">
+	                        </div>
+	                        <div class="form-group">
+	                            <label>Celular</label>
+	                            <input type="text" class="form-control" name="celular" value="{{ funcionario.celular }}">
+	                        </div>
+	                        <div class="form-group">
+	                            <button class="btn btn-primary" type="submit">Editar</button>
+	                        </div>
+	                    </form>
+	                </div>
+
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+		{% endfor %}
+	    <!-- End modal -->
+	    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    </body>
+</html>
